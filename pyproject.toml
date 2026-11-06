@@ -1,0 +1,36 @@
+[project]
+name = "rag-system-constitution"
+version = "0.1.0"
+description = "RAG system answering questions about the Constitution of the Russian Federation"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "langchain",
+    "langchain-community",
+    "langchain-huggingface",
+    "langchain-qdrant",
+    "langchain-text-splitters",
+    "qdrant-client",
+    "sentence-transformers",
+    "torch",
+    "pydantic-settings",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+# E/F - базовые ошибки, I - сортировка импортов, D - docstrings, UP - современный синтаксис, B - баги
+select = ["E", "F", "I", "D", "UP", "B"]
+ignore = ["D104"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

@@ -1,0 +1,17 @@
+# Окружение и секреты
+.venv/
+env/
+.env
+
+# Локальная база Qdrant (пересобирается командой index)
+qdrant_storage/
+
+# Python
+__pycache__/
+*.py[cod]
+.ruff_cache/
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
