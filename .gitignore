@@ -5,6 +5,7 @@ env/
 
 # Локальная база Qdrant (пересобирается командой index)
 qdrant_storage/
+qdrant_local/
 
 # Python
 __pycache__/

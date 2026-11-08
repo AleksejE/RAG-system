@@ -13,11 +13,17 @@ from src.embeddings.embedder import get_embeddings
 
 
 def get_client() -> QdrantClient:
-    """Create a client for the Qdrant server.
+    """Create a Qdrant client.
+
+    If ``QDRANT_PATH`` is set, Qdrant runs in local (embedded) mode and stores
+    data in that folder, so Docker is not needed. Otherwise the client connects
+    to the server at ``QDRANT_URL``.
 
     Returns:
-        QdrantClient: Client connected to ``QDRANT_URL``.
+        QdrantClient: Qdrant client.
     """
+    if settings.qdrant_path:
+        return QdrantClient(path=settings.qdrant_path)
     return QdrantClient(url=settings.qdrant_url)
 
 
@@ -52,9 +58,7 @@ def index_documents(documents: list[Document]) -> None:
         embedding=get_embeddings(),
     )
     vector_store.add_documents(documents)
-    print(
-        f"Успешно загружено {len(documents)} векторов в коллекцию '{settings.collection_name}'!"
-    )
+    print(f"Успешно загружено {len(documents)} векторов в коллекцию '{settings.collection_name}'!")
 
 
 def load_vector_store() -> QdrantVectorStore:

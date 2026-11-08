@@ -11,7 +11,7 @@ from src.config.settings import settings
 
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 HEADER_TAGS = ("h2", "h3", "h4")
-HEADER_PREFIXES = ("SECTION", "Chapter", "Article")
+HEADER_PREFIXES = ("section", "chapter", "article")
 REQUEST_TIMEOUT_SEC = 30
 
 
@@ -54,11 +54,32 @@ def extract_content(html: str) -> Tag:
         tag.decompose()
     if content.find("h1"):
         content.find("h1").decompose()
+    # Parts of an article are separated by <br/>: keep them on separate lines,
+    # otherwise "speech.<br/>2. Propaganda" turns into "speech.2. Propaganda"
+    for line_break in content.find_all("br"):
+        line_break.replace_with("\n")
     return content
+
+
+def element_text(element: Tag) -> str:
+    """Get the text of an element, keeping line breaks and collapsing other whitespace.
+
+    Args:
+        element (Tag): HTML element.
+
+    Returns:
+        str: Non-empty lines of the element joined with line breaks.
+    """
+    lines = (" ".join(line.split()) for line in element.get_text().split("\n"))
+    return "\n".join(line for line in lines if line)
 
 
 def is_header(element: Tag, text: str) -> bool:
     """Check whether an element is a section, chapter or article title.
+
+    A title is an ``h2``-``h4`` tag, a centered paragraph (this is how the site
+    marks titles such as "Concluding and Transitional Provisions") or a paragraph
+    starting with "Section", "Chapter" or "Article" in any letter case.
 
     Args:
         element (Tag): HTML element.
@@ -67,7 +88,8 @@ def is_header(element: Tag, text: str) -> bool:
     Returns:
         bool: True if the element starts a new block.
     """
-    return element.name in HEADER_TAGS or text.startswith(HEADER_PREFIXES)
+    is_centered = "text-align: center" in str(element.get("style", ""))
+    return element.name in HEADER_TAGS or is_centered or text.lower().startswith(HEADER_PREFIXES)
 
 
 def split_into_blocks(content: Tag) -> list[tuple[str, str]]:
@@ -85,7 +107,7 @@ def split_into_blocks(content: Tag) -> list[tuple[str, str]]:
     current_text: list[str] = []
 
     for element in content.find_all([*HEADER_TAGS, "p"]):
-        text = element.get_text(strip=True)
+        text = element_text(element)
         if not text:
             continue
 

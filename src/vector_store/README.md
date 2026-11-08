@@ -8,7 +8,7 @@
 
 ## Функции
 
-- `get_client()` создаёт клиент для `QDRANT_URL`.
+- `get_client()` создаёт клиент для `QDRANT_URL`, а если задан `QDRANT_PATH`, то локальный клиент без Docker.
 - `recreate_collection(client)` удаляет старую коллекцию и создаёт пустую с косинусной метрикой и размерностью `EMBEDDING_DIM`.
 - `index_documents(documents)` пересоздаёт коллекцию и загружает в неё чанки.
 - `load_vector_store()` подключается к готовой коллекции (используется в `rag`).
@@ -21,4 +21,8 @@ docker compose up -d
 
 Данные базы хранятся в папке `qdrant_storage/` в корне проекта. Она не попадает в git: каждый участник собирает базу у себя командой `uv run python -m src.main index`.
 
-Веб-интерфейс Qdrant доступен по адресу http://localhost:6333/dashboard.
+### Без Docker
+
+Если Docker недоступен, раскомментируйте в `.env` строку `QDRANT_PATH=qdrant_local`. Тогда Qdrant работает внутри Python-процесса и хранит базу в папке `qdrant_local/`, которая не попадает в git. Ограничение: с такой базой одновременно может работать только один процесс.
+
+Веб-интерфейс Qdrant (только при запуске в Docker) доступен по адресу http://localhost:6333/dashboard.

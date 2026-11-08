@@ -32,7 +32,8 @@ rag-system-constitution/
 │   ├── chunking/         # разбиение текста на чанки с метаданными
 │   ├── embeddings/       # модель эмбеддингов bge-m3
 │   ├── vector_store/     # модуль БД: работа с Qdrant
-│   └── main.py           # точка входа: index / search
+│   ├── rag/              # RAG-chain: retriever + промпт + Groq LLM
+│   └── main.py           # точка входа: index / search / ask
 ├── experiments/          # эксперименты с параметрами RAG
 ├── analytics/            # оценка качества ответов
 ├── docker-compose.yml    # запуск Qdrant
@@ -64,7 +65,16 @@ uv run python -m src.main index
 
 # 6. Проверить, что поиск работает
 uv run python -m src.main search "term of office of the President"
+
+# 7. Задать вопрос (нужен GROQ_API_KEY в .env)
+uv run python -m src.main ask "На какой срок избирается Президент?"
+
+# 8. Оценить качество поиска на контрольных вопросах
+uv run python -m analytics.evaluate_retrieval
 ```
+
+Нет Docker? Раскомментируйте в `.env` строку `QDRANT_PATH=qdrant_local` и пропустите шаг 4:
+Qdrant будет работать локально и хранить базу в папке `qdrant_local/`.
 
 При первом запуске модель `bge-m3` (около 2 ГБ) скачается с HuggingFace.
 
@@ -85,4 +95,4 @@ uv run ruff format .         # format
    крупной функции есть docstring в формате Google.
 4. При добавлении новой папки в `src/` создаём в ней `README.md`.
 5. Ключи API храним только в `.env`, который не попадает в git.
-6. Папки `.venv/` и `qdrant_storage/` в репозиторий не коммитим.
+6. Папки `.venv/`, `qdrant_storage/` и `qdrant_local/` в репозиторий не коммитим.
